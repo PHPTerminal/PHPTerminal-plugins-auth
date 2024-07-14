@@ -115,7 +115,7 @@ class Auth extends Plugins
             'settings' =>
             [
                 'cost'      => 4,
-                'hash'      => 'PASSWORD_BCRYPT'//Check needs to be there when changing constant via terminal, maybe present a list of available encryption and make user type the corresponding number.
+                'hash'      => 'PASSWORD_BCRYPT'
             ]
         ];
     }
