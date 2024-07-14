@@ -60,7 +60,7 @@ class Auth implements PluginsInterface
                 }
 
                 return [
-                    'id'        => $account[0]['id'],
+                    'id'        => $account[0]['_id'],
                     'profile'   => $account[0]['profile']
                 ];
             }
