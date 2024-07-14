@@ -59,7 +59,10 @@ class Auth implements PluginsInterface
                     $this->authStore->update($account);
                 }
 
-                return true;
+                return [
+                    'id'        => $account[0]['id'],
+                    'profile'   => $account[0]['profile']
+                ];
             }
         }
 
