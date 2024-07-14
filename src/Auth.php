@@ -2,11 +2,11 @@
 
 namespace PHPTerminalAuth;
 
-use PHPTerminal\PluginsInterface;
+use PHPTerminal\Plugins;
 use PHPTerminal\Terminal;
 use SleekDB\Store;
 
-class Auth implements PluginsInterface
+class Auth extends Plugins
 {
     protected $terminal;
 
