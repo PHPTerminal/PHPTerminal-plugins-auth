@@ -1,0 +1,37 @@
+{
+    "name": "oyeaussie/phpterminal-plugins-auth",
+    "description": "PHPTerminalAuth is an authentication plugin for phpterminal application.",
+    "keywords": [
+        "php",
+        "terminal"
+    ],
+    "authors": [
+        {
+            "name": "Oyeaussie",
+            "email": "email@oyeaussie.com",
+            "homepage": "https://github.com/oyeaussie"
+        }
+    ],
+    "funding": [
+        {
+            "url": "https://github.com/sponsors/oyeaussie",
+            "type": "github"
+        },
+        {
+            "url": "https://buymeacoffee.com/oyeaussie",
+            "type": "other"
+        }
+    ],
+    "require": {
+        "php": "^7.2.5 || ^8.0",
+        "ext-json": "*",
+        "oyeaussie/phpterminal": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "PHPTerminalAuth\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "license": "MIT"
+}
