@@ -25,7 +25,11 @@ class Auth implements PluginsInterface
                 [
                     '_id'       => 1,
                     'username'  => 'admin',
-                    'password'  => $this->hashPassword('admin123')
+                    'password'  => $this->hashPassword('admin123'),
+                    'profile'   => [
+                        'full_name' => 'Administrator',
+                        'email'     => 'email@yourdomain.com'
+                    ]
                 ]
             );
         }
