@@ -12,7 +12,7 @@ class Auth implements PluginsInterface
 
     protected $authStore;
 
-    public function init(Terminal $terminal)
+    public function init(Terminal $terminal) : object
     {
         $this->terminal = $terminal;
 
@@ -29,6 +29,8 @@ class Auth implements PluginsInterface
                 ]
             );
         }
+
+        return $this;
     }
 
     public function newAccount()
