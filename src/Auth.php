@@ -18,7 +18,7 @@ class Auth implements PluginsInterface
 
         $this->authStore = new Store("auth", $this->terminal->databaseDirectory, $this->terminal->storeConfiguration);
 
-        $accounts = $this->configStore->findAll();
+        $accounts = $this->authStore->findAll();
 
         if ($accounts && count($accounts) === 0) {
             $this->authStore->updateOrInsert(
