@@ -20,8 +20,8 @@ class Auth implements PluginsInterface
 
         $accounts = $this->authStore->findAll();
 
-        if ($accounts && count($accounts) === 0) {
-            $this->authStore->updateOrInsert(
+        if (is_array($accounts) && count($accounts) === 0) {
+            $admin = $this->authStore->updateOrInsert(
                 [
                     '_id'       => 1,
                     'username'  => 'admin',
