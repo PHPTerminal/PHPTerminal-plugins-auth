@@ -12,7 +12,7 @@ class Auth implements PluginsInterface
 
     protected $authStore;
 
-    public function init(Terminal $terminal, $command)
+    public function init(Terminal $terminal)
     {
         $this->terminal = $terminal;
 
