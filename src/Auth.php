@@ -12,6 +12,8 @@ class Auth extends Plugins
 
     protected $authStore;
 
+    protected $defaultPassword = 'admin';
+
     public function init(Terminal $terminal) : object
     {
         $this->terminal = $terminal;
@@ -25,7 +27,7 @@ class Auth extends Plugins
                 [
                     '_id'       => 1,
                     'username'  => 'admin',
-                    'password'  => $this->hashPassword('admin123'),
+                    'password'  => $this->hashPassword($this->defaultPassword),
                     'profile'   => [
                         'full_name' => 'Administrator',
                         'email'     => 'email@yourdomain.com'
@@ -40,6 +42,11 @@ class Auth extends Plugins
     public function newAccount()
     {
         //
+    }
+
+    public function getDefaultPassword()
+    {
+        return $this->defaultPassword;
     }
 
     public function attempt($username, $password)
@@ -113,7 +120,9 @@ class Auth extends Plugins
         return
             [
                 'cost'      => 4,
-                'hash'      => 'PASSWORD_BCRYPT'
+                'hash'      => 'PASSWORD_BCRYPT',
+                'canAdd'    => true,
+                'canReset'  => true
             ];
     }
 }
