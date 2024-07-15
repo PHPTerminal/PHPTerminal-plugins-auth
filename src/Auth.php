@@ -14,6 +14,14 @@ class Auth extends Plugins
 
     protected $defaultPassword = 'admin';
 
+    private $newPassword;
+
+    private $confirmNewPassword;
+
+    private $newPasswordPromptCount = 0;
+
+    private $confirmNewPasswordPromptCount = 0;
+
     public function init(Terminal $terminal) : object
     {
         $this->terminal = $terminal;
@@ -44,11 +52,6 @@ class Auth extends Plugins
         //
     }
 
-    public function getDefaultPassword()
-    {
-        return $this->defaultPassword;
-    }
-
     public function attempt($username, $password)
     {
         return $this->checkAccount($username, $password);
@@ -60,6 +63,12 @@ class Auth extends Plugins
 
         if (count($account) === 1) {
             if ($this->checkPassword($password, $account[0]['password'])) {
+                if ($this->getSettings()['canReset'] &&
+                    $password === $this->defaultPassword
+                ) {
+                    $password = $this->changePassword($account);
+                }
+
                 if ($this->passwordNeedsRehash($account[0]['password'])) {
                     $account[0]['password'] = $this->hashPassword($password);
 
@@ -78,9 +87,105 @@ class Auth extends Plugins
         return false;
     }
 
-    public function changePassword()
+    public function changePassword($account)
     {
-        //
+        if (isset($accoun['id'])) {
+            $account = $this->authStore->findById($account['id']);
+        }
+
+        if ($account) {
+            $newPassword = $this->runChangePassword();
+
+            $account[0]['password']  = $this->hashPassword($newPassword);
+
+            $this->authStore->update($account[0]);
+
+            return $newPassword;
+        }
+
+        return false;
+    }
+
+    protected function runChangePassword($initial = true)
+    {
+        $command = [];
+
+        readline_callback_handler_install("", function () {});
+
+        if ($initial) {
+            \cli\line("%r%w");
+            \cli\line("%bEnter new password\n");
+            \cli\out("%wNew Password: ");
+        } else {
+            \cli\out("%wConfirm New Password: ");
+        }
+
+        while (true) {
+            $input = stream_get_contents(STDIN, 1);
+
+            if (ord($input) == 10) {
+                // if (!$initial) {
+                \cli\line("%r%w");
+                // }
+                break;
+            } else if (ord($input) == 127) {
+                if (count($command) === 0) {
+                    continue;
+                }
+                array_pop($command);
+                fwrite(STDOUT, chr(8));
+                fwrite(STDOUT, "\033[0K");
+            } else {
+                $command[] = $input;
+
+                fwrite(STDOUT, '*');
+            }
+        }
+
+        $command = join($command);
+
+        while (true) {
+            if ($command !== '') {
+                if ($initial) {
+                    $this->newPassword = $command;
+                } else {
+                    $this->confirmNewPassword = $command;
+                }
+                if ($this->newPassword && !$this->confirmNewPassword) {
+                    $initial = false;
+                } else if (!$this->newPassword && $this->confirmNewPassword) {
+                    $initial = true;
+                } else if (($this->newPassword && $this->confirmNewPassword) &&
+                           ($this->newPassword !== $this->confirmNewPassword)
+                ) {
+                    $initial = true;
+                }
+            } else {
+                if ($initial) {
+                    $this->newPasswordPromptCount++;
+                } else {
+                    $this->confirmNewPasswordPromptCount++;
+                }
+            }
+
+            break;
+        }
+
+        if ($this->newPassword && $this->confirmNewPassword) {
+            readline_callback_handler_remove();
+
+            return $this->newPassword;
+        }
+
+        if ($this->newPasswordPromptCount >= 3 || $this->confirmNewPasswordPromptCount >= 3) {
+            readline_callback_handler_remove();
+
+            $this->terminal->addResponse('Incorrect Password! Try again...', 1);
+
+            return true;
+        }
+
+        return $this->runChangePassword($initial);
     }
 
     protected function hashPassword(string $password)
