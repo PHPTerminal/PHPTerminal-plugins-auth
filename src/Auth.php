@@ -1,6 +1,6 @@
 <?php
 
-namespace PHPTerminalAuth;
+namespace PHPTerminalPluginsAuth;
 
 use PHPTerminal\Plugins;
 use PHPTerminal\Terminal;
