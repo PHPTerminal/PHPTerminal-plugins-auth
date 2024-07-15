@@ -82,16 +82,18 @@ class Auth extends Plugins
                     $password = $this->changePassword($account[0]);
                 }
 
-                if ($this->passwordNeedsRehash($account[0]['password'])) {
-                    $account[0]['password'] = $this->hashPassword($password);
+                if ($password) {
+                    if ($this->passwordNeedsRehash($account[0]['password'])) {
+                        $account[0]['password'] = $this->hashPassword($password);
 
-                    $this->authStore->update($account);
+                        $this->authStore->update($account);
+                    }
+
+                    return [
+                        'id'        => $account[0]['_id'],
+                        'profile'   => $account[0]['profile']
+                    ];
                 }
-
-                return [
-                    'id'        => $account[0]['_id'],
-                    'profile'   => $account[0]['profile']
-                ];
             }
         }
 
@@ -109,11 +111,13 @@ class Auth extends Plugins
         if ($account) {
             $newPassword = $this->runChangePassword();
 
-            $account['password']  = $this->hashPassword($newPassword);
+            if ($newPassword) {
+                $account['password']  = $this->hashPassword($newPassword);
 
-            $this->authStore->update($account);
+                $this->authStore->update($account);
 
-            return $newPassword;
+                return $newPassword;
+            }
         }
 
         return false;
@@ -194,7 +198,7 @@ class Auth extends Plugins
 
             $this->terminal->addResponse('Incorrect Password! Try again...', 1);
 
-            return true;
+            return false;
         }
 
         return $this->runChangePassword($initial);
