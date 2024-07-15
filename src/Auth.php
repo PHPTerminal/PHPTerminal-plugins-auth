@@ -80,9 +80,9 @@ class Auth extends Plugins
     {
         return password_hash(
             $password,
-            PASSWORD_BCRYPT,
+            constant($this->terminal->config['plugins']['auth']['settings']['hash']) ?? PASSWORD_BCRYPT,
             [
-                'cost' => 4
+                'cost' => $this->terminal->config['plugins']['auth']['settings']['cost'] ?? 4
             ]
         );
     }
@@ -96,9 +96,9 @@ class Auth extends Plugins
     {
         return password_needs_rehash(
             $hashedPassword,
-            PASSWORD_BCRYPT,
+            constant($this->terminal->config['plugins']['auth']['settings']['hash']) ?? PASSWORD_BCRYPT,
             [
-                'cost' => 4
+                'cost' => $this->terminal->config['plugins']['auth']['settings']['cost'] ?? 4
             ]
         );
     }
@@ -111,12 +111,9 @@ class Auth extends Plugins
     public function getSettings() : array
     {
         return
-        [
-            'settings' =>
             [
                 'cost'      => 4,
                 'hash'      => 'PASSWORD_BCRYPT'
-            ]
-        ];
+            ];
     }
 }
