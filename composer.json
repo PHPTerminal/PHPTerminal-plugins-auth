@@ -32,6 +32,6 @@
             "PHPTerminalPluginsAuth\\": "src/"
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "license": "MIT"
 }
