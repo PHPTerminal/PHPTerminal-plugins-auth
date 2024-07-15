@@ -1,5 +1,5 @@
 {
-    "name": "oyeaussie/phpterminal-plugins-auth",
+    "name": "phpterminal/phpterminal-plugins-auth",
     "description": "PHPTerminalAuth is an authentication plugin for phpterminal application.",
     "keywords": [
         "php",
@@ -9,7 +9,7 @@
         {
             "name": "Oyeaussie",
             "email": "email@oyeaussie.com",
-            "homepage": "https://github.com/oyeaussie"
+            "homepage": "https://github.com/phpterminal/PHPTerminal-plugins-auth"
         }
     ],
     "funding": [
