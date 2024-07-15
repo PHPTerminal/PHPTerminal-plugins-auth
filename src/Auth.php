@@ -47,6 +47,19 @@ class Auth extends Plugins
         return $this;
     }
 
+    public function getAccount($id)
+    {
+        $account = $this->authStore->findById($id);
+
+        if ($account) {
+            unset($account['password']);
+
+            return $account;
+        }
+
+        return false;
+    }
+
     public function newAccount()
     {
         //
@@ -66,7 +79,7 @@ class Auth extends Plugins
                 if ($this->getSettings()['canReset'] &&
                     $password === $this->defaultPassword
                 ) {
-                    $password = $this->changePassword($account);
+                    $password = $this->changePassword($account[0]);
                 }
 
                 if ($this->passwordNeedsRehash($account[0]['password'])) {
@@ -96,9 +109,9 @@ class Auth extends Plugins
         if ($account) {
             $newPassword = $this->runChangePassword();
 
-            $account[0]['password']  = $this->hashPassword($newPassword);
+            $account['password']  = $this->hashPassword($newPassword);
 
-            $this->authStore->update($account[0]);
+            $this->authStore->update($account);
 
             return $newPassword;
         }
@@ -124,9 +137,8 @@ class Auth extends Plugins
             $input = stream_get_contents(STDIN, 1);
 
             if (ord($input) == 10) {
-                // if (!$initial) {
                 \cli\line("%r%w");
-                // }
+
                 break;
             } else if (ord($input) == 127) {
                 if (count($command) === 0) {
