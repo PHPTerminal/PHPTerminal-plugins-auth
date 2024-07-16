@@ -39,6 +39,11 @@ class Auth extends Plugins
                     'profile'   => [
                         'full_name' => 'Administrator',
                         'email'     => 'email@yourdomain.com'
+                    ],
+                    'permissions'   => [
+                        'add'       => true,
+                        'edit'      => true,
+                        'remove'    => true
                     ]
                 ]
             );
@@ -240,10 +245,9 @@ class Auth extends Plugins
     {
         return
             [
-                'cost'      => 4,
-                'hash'      => 'PASSWORD_BCRYPT',
-                'canAdd'    => true,
-                'canReset'  => true
+                'cost'              => 4,
+                'hash'              => 'PASSWORD_BCRYPT',
+                'canResetPasswd'    => true
             ];
     }
 }
