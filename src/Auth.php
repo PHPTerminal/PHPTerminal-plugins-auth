@@ -73,10 +73,11 @@ class Auth extends Plugins
                         $this->authStore->update($account);
                     }
 
-                    return [
-                        'id'        => $account[0]['_id'],
-                        'profile'   => $account[0]['profile']
-                    ];
+                    $account[0]['id'] = $account[0]['_id'];
+                    unset($account[0]['_id']);
+                    unset($account[0]['password']);
+
+                    return $account[0];
                 }
             }
         }
