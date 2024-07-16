@@ -60,7 +60,7 @@ class Auth extends Plugins
 
         if (count($account) === 1) {
             if ($this->checkPassword($password, $account[0]['password'])) {
-                if ($this->getSettings()['canReset'] &&
+                if ($this->getSettings()['canResetPasswd'] &&
                     $password === $this->defaultPassword
                 ) {
                     $password = $this->changePassword($account[0]);
@@ -192,7 +192,7 @@ class Auth extends Plugins
     {
         return password_hash(
             $password,
-            constant($this->terminal->config['plugins']['auth']['settings']['hash']) ?? PASSWORD_BCRYPT,
+            constant($this->terminal->config['plugins']['auth']['settings']['hash'] ?? $this->getSettings()['hash']) ?? PASSWORD_BCRYPT,
             [
                 'cost' => $this->terminal->config['plugins']['auth']['settings']['cost'] ?? 4
             ]
@@ -208,7 +208,7 @@ class Auth extends Plugins
     {
         return password_needs_rehash(
             $hashedPassword,
-            constant($this->terminal->config['plugins']['auth']['settings']['hash']) ?? PASSWORD_BCRYPT,
+            constant($this->terminal->config['plugins']['auth']['settings']['hash'] ?? $this->getSettings()['hash']) ?? PASSWORD_BCRYPT,
             [
                 'cost' => $this->terminal->config['plugins']['auth']['settings']['cost'] ?? 4
             ]
