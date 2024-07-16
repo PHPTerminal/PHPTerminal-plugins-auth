@@ -28,27 +28,6 @@ class Auth extends Plugins
 
         $this->authStore = new Store("auth", $this->terminal->databaseDirectory, $this->terminal->storeConfiguration);
 
-        $accounts = $this->authStore->findAll();
-
-        if (is_array($accounts) && count($accounts) === 0) {
-            $admin = $this->authStore->updateOrInsert(
-                [
-                    '_id'       => 1,
-                    'username'  => 'admin',
-                    'password'  => $this->hashPassword($this->defaultPassword),
-                    'profile'   => [
-                        'full_name' => 'Administrator',
-                        'email'     => 'email@yourdomain.com'
-                    ],
-                    'permissions'   => [
-                        'add'       => true,
-                        'edit'      => true,
-                        'remove'    => true
-                    ]
-                ]
-            );
-        }
-
         return $this;
     }
 
@@ -239,6 +218,39 @@ class Auth extends Plugins
     public function updateSettings()
     {
         //
+    }
+
+    public function onInstall() : object
+    {
+        $accounts = $this->authStore->findAll();
+
+        if (is_array($accounts) && count($accounts) === 0) {
+            $admin = $this->authStore->updateOrInsert(
+                [
+                    '_id'       => 1,
+                    'username'  => 'admin',
+                    'password'  => $this->hashPassword($this->defaultPassword),
+                    'profile'   => [
+                        'full_name' => 'Administrator',
+                        'email'     => 'email@yourdomain.com'
+                    ],
+                    'permissions'   => [
+                        'add'       => true,
+                        'edit'      => true,
+                        'remove'    => true
+                    ]
+                ]
+            );
+        }
+
+        return $this;
+    }
+
+    public function onUninstall() : object
+    {
+        $this->authStore->deleteStore();
+
+        return $this;
     }
 
     public function getSettings() : array
