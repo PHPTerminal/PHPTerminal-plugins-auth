@@ -36,6 +36,8 @@ class Auth extends Plugins
         $account = $this->authStore->findById($id);
 
         if ($account) {
+            $account['id'] = $account['_id'];
+            unset($account['_id']);
             unset($account['password']);
 
             return $account;
@@ -89,7 +91,7 @@ class Auth extends Plugins
 
     public function changePassword($account)
     {
-        if (isset($accoun['id'])) {
+        if (array_key_exists('id', $account)) {
             $account = $this->authStore->findById($account['id']);
         }
 
@@ -97,12 +99,21 @@ class Auth extends Plugins
             $newPassword = $this->runChangePassword();
 
             if ($newPassword) {
-                $account['password']  = $this->hashPassword($newPassword);
+                if ($this->checkPassword($newPassword, $account['password'])) {
+                    \cli\line("");
+                    \cli\line("%rNew password same as current password!%w" . PHP_EOL);
 
-                $this->authStore->update($account);
+                    return false;
+                } else {
+                    $account['password']  = $this->hashPassword($newPassword);
 
-                return $newPassword;
+                    $this->authStore->update($account);
+
+                    return $newPassword;
+                }
             }
+        } else {
+            $this->terminal->addResponse('Account with given ID not found!', 1);
         }
 
         return false;
@@ -115,11 +126,11 @@ class Auth extends Plugins
         readline_callback_handler_install("", function () {});
 
         if ($initial) {
-            \cli\line("%r%w");
-            \cli\line("%bEnter new password\n");
-            \cli\out("%wNew Password: ");
+            \cli\line("");
+            \cli\line("%bEnter new password%w" . PHP_EOL);
+            \cli\out("%wNew Password: %w");
         } else {
-            \cli\out("%wConfirm New Password: ");
+            \cli\out("%wConfirm New Password: %w");
         }
 
         while (true) {
@@ -173,6 +184,15 @@ class Auth extends Plugins
         }
 
         if ($this->newPassword && $this->confirmNewPassword) {
+            if ($this->newPassword !== $this->confirmNewPassword) {
+                \cli\line("%rNew and confirm password do not match! Try again...%w");
+
+                $this->newPassword = null;
+                $this->confirmNewPassword = null;
+
+                return $this->runChangePassword($initial);
+            }
+
             readline_callback_handler_remove();
 
             return $this->newPassword;
