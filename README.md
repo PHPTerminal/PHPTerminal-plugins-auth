@@ -1,5 +1,5 @@
 # PHPTerminal-plugins-auth
-PHPTerminalAuth is an authentication plugin for phpterminal application.
+PHPTerminal-plugins-auth is an authentication plugin for phpterminal application.
 
 <h2>Credits:</h2>
 Thanks to the following projects for their great work. Without them, this project would not be possible.<br>

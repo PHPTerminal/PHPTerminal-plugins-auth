@@ -1,6 +1,6 @@
 {
     "name": "phpterminal/phpterminal-plugins-auth",
-    "description": "PHPTerminalAuth is an authentication plugin for phpterminal application.",
+    "description": "PHPTerminal-plugins-auth is an authentication plugin for phpterminal application.",
     "keywords": [
         "php",
         "terminal"
