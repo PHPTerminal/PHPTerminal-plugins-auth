@@ -136,7 +136,7 @@ class Auth extends Plugins
         while (true) {
             $input = stream_get_contents(STDIN, 1);
 
-            if (ord($input) == 10) {
+            if (ord($input) == 10 || ord($input) == 13) {
                 \cli\line("%r%w");
 
                 break;
