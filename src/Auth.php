@@ -31,7 +31,7 @@ class Auth extends Plugins
         return $this;
     }
 
-    public function getAccount($id)
+    public function getAccountById($id)
     {
         $account = $this->authStore->findById($id);
 
@@ -46,7 +46,180 @@ class Auth extends Plugins
         return false;
     }
 
-    public function newAccount()
+    public function getAccountByUsername($username)
+    {
+        $account = $this->authStore->findBy(['username', '=', strtolower($username)]);
+
+        if (count($account) === 1) {
+            $account[0]['id'] = $account[0]['_id'];
+            unset($account[0]['_id']);
+            unset($account[0]['password']);
+
+            return $account[0];
+        }
+
+        return false;
+    }
+
+    public function getAllAccount()
+    {
+        //
+    }
+
+    public function addAccount(array $data)
+    {
+        if (!isset($data['username']) ||
+            (isset($data['username']) && $data['username'] === '')
+        ) {
+            \cli\line("");
+            \cli\line('%rPlease provide username%w');
+            \cli\line("");
+
+            return false;
+        }
+
+        $account = $this->authStore->findBy(['username', '=', strtolower($data['username'])]);
+
+        if ($account) {
+            \cli\line("");
+            \cli\line('%rAccount with username : ' . $data['username'] . ' already exists!%w');
+            \cli\line("");
+
+            return false;
+        }
+
+        if (!isset($data['password']) ||
+            (isset($data['password']) && $data['password'] === '')
+        ) {
+            $data['password'] = $this->defaultPassword;
+        }
+
+        $newAccount['username'] = $data['username'];
+        $newAccount['password'] = $this->hashPassword($data['password']);
+        $newAccount['profile']['full_name'] = 'New Account';
+        if (isset($data['full_name'])) {
+            $newAccount['profile']['full_name'] = $data['full_name'];
+        }
+        $newAccount['profile']['email'] = 'email@yourdomain.com';
+        if (isset($data['email'])) {
+            $newAccount['profile']['email'] = $data['email'];
+        }
+        $newAccount['permissions']['enable'] = true;
+        if (isset($data['permissions']['enable'])) {
+            $newAccount['permissions']['enable'] = (bool) $data['permissions']['enable'];
+        }
+        $newAccount['permissions']['config'] = true;
+        if (isset($data['permissions']['config'])) {
+            $newAccount['permissions']['config'] = (bool) $data['permissions']['config'];
+        }
+
+        if ($this->authStore->insert($newAccount)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public function updateAccount(array $data)
+    {
+        if (!isset($data['username']) ||
+            (isset($data['username']) && $data['username'] === '')
+        ) {
+            \cli\line("");
+            \cli\line('%rPlease provide username%w');
+            \cli\line("");
+
+            return false;
+        }
+
+        $account = $this->authStore->findBy(['username', '=', strtolower($data['username'])]);
+
+        if (!$account) {
+            \cli\line("");
+            \cli\line('%rAccount with username : ' . $data['username'] . ' does not exist!%w');
+            \cli\line("");
+
+            return false;
+        }
+
+        if (isset($data['full_name'])) {
+            $account['profile']['full_name'] = $data['full_name'];
+        }
+
+        if (isset($data['email'])) {
+            $account['profile']['email'] = $data['email'];
+        }
+
+        if (isset($data['permissions']['enable'])) {
+            $account['permissions']['enable'] = (bool) $data['permissions']['enable'];
+        }
+
+        if (isset($data['permissions']['config'])) {
+            $account['permissions']['config'] = (bool) $data['permissions']['config'];
+        }
+
+        if ($this->authStore->update($account)) {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public function removeAccount($id)
+    {
+        $account = $this->getAccountById($id);
+
+        if ($account) {
+            return $this->authStore->deleteById($id);
+        }
+
+        return false;
+    }
+
+    public function onInstall() : object
+    {
+        $accounts = $this->authStore->findAll();
+
+        if (is_array($accounts) && count($accounts) === 0) {
+            $admin = $this->authStore->updateOrInsert(
+                [
+                    '_id'       => 1,
+                    'username'  => 'admin',
+                    'password'  => $this->hashPassword($this->defaultPassword),
+                    'profile'   => [
+                        'full_name' => 'Administrator',
+                        'email'     => 'email@yourdomain.com'
+                    ],
+                    'permissions'   => [
+                        'enable'    => true,
+                        'config'    => true
+                    ]
+                ]
+            );
+        }
+
+        return $this;
+    }
+
+    public function onUninstall() : object
+    {
+        $this->authStore->deleteStore();
+
+        return $this;
+    }
+
+    public function getSettings() : array
+    {
+        return
+            [
+                'cost'              => 4,
+                'hash'              => 'PASSWORD_BCRYPT',
+                'canResetPasswd'    => true
+            ];
+    }
+
+    public function updateSettings(array $data)
     {
         //
     }
@@ -234,53 +407,5 @@ class Auth extends Plugins
                 'cost' => $this->terminal->config['plugins']['auth']['settings']['cost'] ?? 4
             ]
         );
-    }
-
-    public function updateSettings()
-    {
-        //
-    }
-
-    public function onInstall() : object
-    {
-        $accounts = $this->authStore->findAll();
-
-        if (is_array($accounts) && count($accounts) === 0) {
-            $admin = $this->authStore->updateOrInsert(
-                [
-                    '_id'       => 1,
-                    'username'  => 'admin',
-                    'password'  => $this->hashPassword($this->defaultPassword),
-                    'profile'   => [
-                        'full_name' => 'Administrator',
-                        'email'     => 'email@yourdomain.com'
-                    ],
-                    'permissions'   => [
-                        'add'       => true,
-                        'edit'      => true,
-                        'remove'    => true
-                    ]
-                ]
-            );
-        }
-
-        return $this;
-    }
-
-    public function onUninstall() : object
-    {
-        $this->authStore->deleteStore();
-
-        return $this;
-    }
-
-    public function getSettings() : array
-    {
-        return
-            [
-                'cost'              => 4,
-                'hash'              => 'PASSWORD_BCRYPT',
-                'canResetPasswd'    => true
-            ];
     }
 }
