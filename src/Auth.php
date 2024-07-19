@@ -61,9 +61,29 @@ class Auth extends Plugins
         return false;
     }
 
-    public function getAllAccount()
+    public function getAllAccounts()
     {
-        //
+        $accounts = $this->authStore->findAll();
+
+        if ($accounts && count($accounts) > 0) {
+            foreach ($accounts as $accountKey => &$account) {
+                $account['id'] = $account['_id'];
+                unset($account['_id']);
+                unset($account['password']);
+                $account['full_name'] = $account['profile']['full_name'];
+                $account['email'] = $account['profile']['email'];
+                unset($account['profile']);
+                $account['permissions_enable'] = $account['permissions']['enable'];
+                $account['permissions_config'] = $account['permissions']['config'];
+                unset($account['permissions']);
+
+                $account = array_replace(array_flip(array('id', 'username', 'full_name', 'email', 'permissions_enable', 'permissions_config')), $account);
+            }
+
+            return $accounts;
+        }
+
+        return false;
     }
 
     public function addAccount(array $data)
@@ -143,22 +163,22 @@ class Auth extends Plugins
         }
 
         if (isset($data['full_name'])) {
-            $account['profile']['full_name'] = $data['full_name'];
+            $account[0]['profile']['full_name'] = $data['full_name'];
         }
 
         if (isset($data['email'])) {
-            $account['profile']['email'] = $data['email'];
+            $account[0]['profile']['email'] = $data['email'];
         }
 
         if (isset($data['permissions']['enable'])) {
-            $account['permissions']['enable'] = (bool) $data['permissions']['enable'];
+            $account[0]['permissions']['enable'] = (bool) $data['permissions']['enable'];
         }
 
         if (isset($data['permissions']['config'])) {
-            $account['permissions']['config'] = (bool) $data['permissions']['config'];
+            $account[0]['permissions']['config'] = (bool) $data['permissions']['config'];
         }
 
-        if ($this->authStore->update($account)) {
+        if ($this->authStore->update($account[0])) {
             return true;
         }
 
