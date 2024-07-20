@@ -66,7 +66,7 @@ class Auth extends Plugins
         $accounts = $this->authStore->findAll();
 
         if ($accounts && count($accounts) > 0) {
-            foreach ($accounts as $accountKey => &$account) {
+            array_walk($accounts, function(&$account) {
                 $account['id'] = $account['_id'];
                 unset($account['_id']);
                 unset($account['password']);
@@ -76,9 +76,7 @@ class Auth extends Plugins
                 $account['permissions_enable'] = $account['permissions']['enable'];
                 $account['permissions_config'] = $account['permissions']['config'];
                 unset($account['permissions']);
-
-                $account = array_replace(array_flip(array('id', 'username', 'full_name', 'email', 'permissions_enable', 'permissions_config')), $account);
-            }
+            });
 
             return $accounts;
         }
