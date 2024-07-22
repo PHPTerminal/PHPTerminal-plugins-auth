@@ -36,8 +36,7 @@ class Auth extends Plugins
         $account = $this->authStore->findById($id);
 
         if ($account) {
-            $account['id'] = $account['_id'];
-            unset($account['_id']);
+            unset($account['id']);
             unset($account['password']);
 
             return $account;
@@ -51,8 +50,7 @@ class Auth extends Plugins
         $account = $this->authStore->findBy(['username', '=', strtolower($username)]);
 
         if (count($account) === 1) {
-            $account[0]['id'] = $account[0]['_id'];
-            unset($account[0]['_id']);
+            unset($account[0]['id']);
             unset($account[0]['password']);
 
             return $account[0];
@@ -67,8 +65,7 @@ class Auth extends Plugins
 
         if ($accounts && count($accounts) > 0) {
             array_walk($accounts, function(&$account) {
-                $account['id'] = $account['_id'];
-                unset($account['_id']);
+                unset($account['id']);
                 unset($account['password']);
                 $account['full_name'] = $account['profile']['full_name'];
                 $account['email'] = $account['profile']['email'];
@@ -202,7 +199,7 @@ class Auth extends Plugins
         if (is_array($accounts) && count($accounts) === 0) {
             $admin = $this->authStore->updateOrInsert(
                 [
-                    '_id'       => 1,
+                    'id'        => 1,
                     'username'  => 'admin',
                     'password'  => $this->hashPassword($this->defaultPassword),
                     'profile'   => [
@@ -266,8 +263,7 @@ class Auth extends Plugins
                         $this->authStore->update($account);
                     }
 
-                    $account[0]['id'] = $account[0]['_id'];
-                    unset($account[0]['_id']);
+                    unset($account[0]['id']);
                     unset($account[0]['password']);
 
                     return $account[0];
